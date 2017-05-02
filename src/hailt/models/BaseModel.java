@@ -21,39 +21,13 @@ public class BaseModel {
   }
 
   public ArrayList<ObjectRecord> all() {
-    ArrayList<ObjectRecord> data = new ArrayList<>();
     String query = "select * from " + getTableName();
-    try {
-      ResultSet result = Database.getInstance().getStatement().executeQuery(query);
-      while (result.next()) {
-        String attributes[] = new String[result.getMetaData().getColumnCount()];
-        for (int i = 1; i <= result.getMetaData().getColumnCount(); i++) {
-          attributes[i - 1] = result.getString(i);
-        }
-        data.add(new ObjectRecord(attributes));
-      }
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
-    }
-    return data;
+    return query(query);
   }
 
   public ArrayList<ObjectRecord> all(String condition) {
-    ArrayList<ObjectRecord> data = new ArrayList<>();
     String query = "select * from " + getTableName() + " where " + condition;
-    try {
-      ResultSet result = Database.getInstance().getStatement().executeQuery(query);
-      while (result.next()) {
-        String attributes[] = new String[result.getMetaData().getColumnCount()];
-        for (int i = 1; i <= result.getMetaData().getColumnCount(); i++) {
-          attributes[i - 1] = result.getString(i);
-        }
-        data.add(new ObjectRecord(attributes));
-      }
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
-    }
-    return data;
+    return query(query);
   }
 
   public ObjectRecord findBy(HashMap<String, String> object) {
@@ -92,5 +66,22 @@ public class BaseModel {
       return null;
     }
     return all(condition).get(0);
+  }
+
+  public boolean destroy(String condition) {
+    String query = "DELETE * FROM " + getTableName();
+    if (!condition.equals("") || condition != null) {
+      query += " where " + condition;
+    }
+    try {
+      return Database.getInstance().getConnection().prepareStatement(query).execute();
+    } catch (SQLException e) {
+      System.out.println(getClass().getSimpleName() + ": " + e.getMessage());
+      return false;
+    }
+  }
+
+  public static void main(String[] args) {
+    System.out.println("builded");
   }
 }
